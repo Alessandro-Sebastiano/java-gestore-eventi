@@ -77,6 +77,10 @@ public class Evento {
 
     }
 
+    public int availableSeats(){
+        return totalSeats - reservedSeats;
+    }
+
     @Override
     public String toString() {
         return date + " - " + event;
