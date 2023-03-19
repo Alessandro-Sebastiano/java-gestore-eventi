@@ -1,18 +1,13 @@
 package org.lessons.java;
 
-import java.nio.file.ReadOnlyFileSystemException;
-import java.text.ParseException;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
-import java.util.IllegalFormatException;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] arg) throws Exception, IllegalFormatException, ParseException {
+    public static void main(String[] arg) throws Exception {
 
         Scanner input = new Scanner(System.in);
 
@@ -22,7 +17,7 @@ public class Main {
         String evenTitle = input.nextLine();
 
         LocalDate eventFormatDate = null;
-        while(eventFormatDate == null) {
+        while (eventFormatDate == null) {
             try {
                 System.out.println("Data evento: (dd/MM/yyyy) ");
                 String eventDate = input.nextLine();
@@ -34,7 +29,7 @@ public class Main {
         }
 
         int eventSeats = 0;
-        while(eventSeats <= 0) {
+        while (eventSeats <= 0) {
             try {
                 System.out.println("Posti totali evento: ");
                 eventSeats = Integer.parseInt(input.nextLine());
@@ -43,30 +38,58 @@ public class Main {
             }
         }
 
-        Evento newEvent = new Evento(evenTitle, eventFormatDate, eventSeats);
-        System.out.println(newEvent);
+        Evento newEvent = null;
+        try {
+            newEvent = new Evento(evenTitle, eventFormatDate, eventSeats);
+            System.out.println(newEvent);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
-        System.out.println("Vuoi pernotare dei posti? (s / n)");
 
-        String option = input.nextLine();
+        String option = null;
+        try {
+            System.out.println("Vuoi pernotare dei posti? (s / n)");
+            option = input.nextLine();
 
-        switch (option){
+            if (option != "s" || option != "n") {
+                throw new Exception("Inserire un opzione valida");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        switch (option) {
 
             case "s":
-                System.out.println("Quante prenotazioni vuoi fare?");
 
-                int reserveNum = Integer.parseInt(input.nextLine());
 
-                try{
-                    if(reserveNum > newEvent.getTotalSeats()){
-                        throw new Exception("Non ci sono abbastanza posti disponibili");
+                boolean stop = false;
+                while (!stop) {
+                    try {
+
+                        System.out.println("Quante prenotazioni vuoi fare?");
+
+                        int reserveNum = Integer.parseInt(input.nextLine());
+
+                        if (reserveNum > newEvent.getTotalSeats()) {
+                            throw new Exception("Non ci sono abbastanza posti disponibili");
+                        }
+                        stop = true;
+                        for (int i = 1; i <= reserveNum; i++) {
+                            newEvent.reserve();
+                        }
+
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("Inserire un numero valido");
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
-                for (int i = 1; i <= reserveNum; i++) {
-                    newEvent.reserve();
+
                 }
-                }catch (Exception e){
-                System.out.println(e.getMessage());
-                }
+
 
                 System.out.println("Posti prenotati: " + newEvent.getReservedSeats() + "\n" + "Posti disponibili: " + newEvent.availableSeats());
                 break;
@@ -79,7 +102,6 @@ public class Main {
         }
 
 
-
         System.out.println("Vuoi disdire delle prenotazioni? (s / n)");
 
         String secOption = input.nextLine();
@@ -87,20 +109,30 @@ public class Main {
         switch (secOption) {
 
             case "s":
-                System.out.println("Quante prenotazioni vuoi disdire?");
 
-                int cancelNum = Integer.parseInt(input.nextLine());
+                boolean stop = false;
+                while (!stop) {
+                    try {
 
-                try {
-                    if (cancelNum > newEvent.getTotalSeats()) {
-                        throw new Exception("Non ci sono" + cancelNum + "Prenotazioni");
+                        System.out.println("Quante prenotazioni vuoi disdire?");
+
+                        int cancelNum = Integer.parseInt(input.nextLine());
+
+                        if (cancelNum > newEvent.getTotalSeats()) {
+                            throw new Exception("Non ci sono" + cancelNum + "Prenotazioni");
+                        }
+                        stop = true;
+                        for (int i = 1; i <= cancelNum; i++) {
+                            newEvent.cancel();
+                        }
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("Inserire un numero valido");
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
-                    for (int i = 1; i <= cancelNum; i++) {
-                        newEvent.cancel();
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
                 }
+
 
                 System.out.println("Posti prenotati: " + newEvent.getReservedSeats() + "\n" + "Posti disponibili: " + newEvent.availableSeats());
                 break;
